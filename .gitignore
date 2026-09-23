@@ -4,5 +4,9 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .coverage
+htmlcov/
+frontend/coverage/
+backend/coverage/
 .github
 package-lock.json
+.DS_Store

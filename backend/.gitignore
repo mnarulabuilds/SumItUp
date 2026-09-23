@@ -1,15 +1,15 @@
-# Ignore node_modules directory
-dist/
-node_modules/
-
-# Ignore .env files containing sensitive information
 .env
 .env.local
 .env.*.local
 !.env.example
 
-# Ignore log files
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
 *.log
 
-# Ignore uploads directory
 uploads/
+pdfs/

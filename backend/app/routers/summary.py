@@ -11,7 +11,7 @@ from app.utils.upload_paths import resolve_upload_path
 
 router = APIRouter(prefix="/summary", tags=["summary"], dependencies=[Depends(get_current_user)])
 
-LEGACY_AUDIO_DIR = Path(__file__).resolve().parents[2] / "legacy_assets" / "audio"
+FIXTURE_AUDIO_DIR = Path(__file__).resolve().parents[2] / "fixtures" / "audio"
 
 
 class AudioData(BaseModel):
@@ -58,8 +58,8 @@ def _resolve_media_path(filename: str) -> Path | None:
             return path
     except AppError:
         pass
-    legacy = LEGACY_AUDIO_DIR / Path(filename).name
-    return legacy if legacy.is_file() else None
+    fixture = FIXTURE_AUDIO_DIR / Path(filename).name
+    return fixture if fixture.is_file() else None
 
 
 @router.post("/generate/audio")

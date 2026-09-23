@@ -68,4 +68,4 @@ Suggestions to evolve SumItUp from a capable prototype into a **production-grade
 
 ---
 
-For implementation status of backend “quick wins,” see [backend/QUICK_WINS_SUMMARY.md](../backend/QUICK_WINS_SUMMARY.md).
+For current capabilities, see [FEATURES.md](./FEATURES.md).

@@ -10,7 +10,7 @@
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 [![React Native](https://img.shields.io/badge/React%20Native-0.72+-blue.svg)](https://reactnative.dev/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-6.0+-green.svg)](https://www.mongodb.com/)
-[![Tests](https://img.shields.io/badge/Tests-158%20Passing-brightgreen.svg)](./backend/tests/)
+[![Tests](https://img.shields.io/badge/Tests-pytest%20%2B%20Jest-brightgreen.svg)](./backend/tests/)
 
 </div>
 
@@ -559,8 +559,8 @@ npm run test:watch
 
 ### **📈 Current Test Stats**
 
-- **Total Tests**: 158
-- **Passing**: 158 (100%)
+- **Backend**: pytest (`backend/tests/`)
+- **Frontend**: Jest (`frontend/src/__tests__/`)
 - **Coverage**: 90%+
 - **Test Types**: Unit, Integration, E2E
 

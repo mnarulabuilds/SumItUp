@@ -1,5 +1,4 @@
 import re
-from datetime import datetime
 
 import jwt
 from fastapi import APIRouter, Depends, HTTPException, Query
