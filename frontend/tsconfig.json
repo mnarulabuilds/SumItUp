@@ -10,8 +10,8 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "moduleResolution": "node",
-    "allowJs": true,
+    "moduleResolution": "bundler",
+    "allowJs": false,
     "baseUrl": "./",
     "paths": {
       "@/*": [
@@ -38,10 +38,14 @@
     }
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx"
+    "App.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "babel.config.ts",
+    "metro.config.ts",
+    "jest.config.ts"
   ]
 }

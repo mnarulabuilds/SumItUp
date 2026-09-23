@@ -4,13 +4,16 @@
   "private": true,
   "description": "SumItUp monorepo — mobile app + API",
   "engines": {
-    "node": ">=20 <27"
+    "node": ">=20 <27",
+    "python": ">=3.11"
   },
   "scripts": {
-    "install:all": "npm install && npm install --prefix backend && npm install --prefix frontend",
+    "install:all": "npm install && npm install --prefix frontend && python3 -m venv backend/.venv && backend/.venv/bin/pip install -r backend/requirements.txt",
     "prepare:local": "node scripts/prepare-local-dev.js",
     "test:unit": "node scripts/ensure-node.js && npm run test:unit --prefix backend && npm run test:unit --prefix frontend",
     "test:coverage": "node scripts/ensure-node.js && npm run test:coverage --prefix backend && npm run test:coverage --prefix frontend",
+    "backend:dev": "npm run dev --prefix backend",
+    "backend:test": "npm run test:unit --prefix backend",
     "dev": "npm run prepare:local && docker compose up -d mongodb && wait-on tcp:127.0.0.1:27017 && concurrently -k -n backend,frontend -c blue,magenta \"npm run dev --prefix backend\" \"npm run start --prefix frontend\"",
     "dev:stop": "docker compose stop mongodb",
     "dev:db": "docker compose up -d mongodb",

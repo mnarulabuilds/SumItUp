@@ -1,10 +1,13 @@
 const fs = require("fs");
 const path = require("path");
+const { spawnSync } = require("child_process");
 
 const root = path.resolve(__dirname, "..");
 const envExample = path.join(root, "backend", ".env.example");
 const envFile = path.join(root, "backend", ".env");
 const uploadsDir = path.join(root, "backend", "uploads");
+const venvDir = path.join(root, "backend", ".venv");
+const requirements = path.join(root, "backend", "requirements.txt");
 
 if (!fs.existsSync(envFile) && fs.existsSync(envExample)) {
   fs.copyFileSync(envExample, envFile);
@@ -16,4 +19,18 @@ if (!fs.existsSync(envFile) && fs.existsSync(envExample)) {
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
   console.log("[prepare-local-dev] Created backend/uploads");
+}
+
+if (!fs.existsSync(venvDir)) {
+  const created = spawnSync("python3", ["-m", "venv", venvDir], { stdio: "inherit" });
+  if (created.status !== 0) {
+    console.warn("[prepare-local-dev] Could not create backend/.venv — run: python3 -m venv backend/.venv");
+  } else {
+    console.log("[prepare-local-dev] Created backend/.venv");
+  }
+}
+
+const pip = path.join(venvDir, "bin", "pip");
+if (fs.existsSync(pip) && fs.existsSync(requirements)) {
+  spawnSync(pip, ["install", "-r", requirements], { stdio: "inherit" });
 }

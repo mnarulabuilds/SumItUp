@@ -50,7 +50,7 @@ Images: `sumitup-backend:latest`, `sumitup-frontend:latest`, plus `mongo:7`.
 npm run docker:test
 ```
 
-Runs backend Mocha and frontend Jest in isolated test targets (`backend-test`, `frontend-test`).
+Runs backend pytest and frontend Jest in isolated test targets (`backend-test`, `frontend-test`).
 
 ## Hybrid local dev (common)
 
@@ -69,7 +69,7 @@ npm run start --prefix frontend
 
 ## How images are built
 
-- **Backend:** multi-stage Dockerfile — `npm ci`, TypeScript compile, sync legacy `.js` utils into `dist/`, run `node dist/index.js`.
+- **Backend:** multi-stage Dockerfile — `pip install`, FastAPI via Uvicorn on port 3000.
 - **Frontend:** Expo web export → nginx serves static files and reverse-proxies `/api` to `backend:3000`.
 
 ## Volumes
