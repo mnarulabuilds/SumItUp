@@ -3,7 +3,10 @@ dist/
 node_modules/
 
 # Ignore .env files containing sensitive information
-.env*
+.env
+.env.local
+.env.*.local
+!.env.example
 
 # Ignore log files
 *.log

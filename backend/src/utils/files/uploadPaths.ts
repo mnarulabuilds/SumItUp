@@ -2,7 +2,9 @@ import fs from "fs";
 import path from "path";
 import { AppError } from "../../lib/errors/AppError";
 
-export const UPLOADS_ROOT = path.resolve(__dirname, "../../../uploads");
+export const UPLOADS_ROOT = process.env.UPLOAD_PATH
+  ? path.resolve(process.env.UPLOAD_PATH)
+  : path.resolve(__dirname, "../../../uploads");
 
 /** Resolves a user-provided filename to a path under uploads (no directory traversal). */
 export function resolveUploadPath(filename: string): string {

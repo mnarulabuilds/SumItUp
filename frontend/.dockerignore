@@ -1,0 +1,6 @@
+node_modules
+dist
+.expo
+web-build
+*.log
+.git

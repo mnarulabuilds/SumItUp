@@ -1,0 +1,78 @@
+services:
+  mongodb:
+    image: mongo:7
+    container_name: sumitup-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - sumitup_mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+    image: sumitup-backend:latest
+    container_name: sumitup-backend
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: "3000"
+      NODE_ENV: production
+      MONGODB_URI: mongodb://mongodb:27017/sumitup
+      JWT_SECRET: ${JWT_SECRET:-dev-docker-jwt-secret-change-me}
+      UPLOAD_PATH: /app/uploads
+    volumes:
+      - backend_uploads:/app/uploads
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: production
+      args:
+        EXPO_PUBLIC_API_URL: /api
+    image: sumitup-frontend:latest
+    container_name: sumitup-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  backend-test:
+    profiles: [test]
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: test
+    image: sumitup-backend:test
+    environment:
+      NODE_ENV: test
+      JWT_SECRET: test-jwt-secret-key-for-unit-tests
+      MONGODB_URI: mongodb://mongodb:27017/sumitup-test
+
+  frontend-test:
+    profiles: [test]
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: test
+    image: sumitup-frontend:test
+    environment:
+      NODE_ENV: test
+
+volumes:
+  sumitup_mongo_data:
+  backend_uploads:

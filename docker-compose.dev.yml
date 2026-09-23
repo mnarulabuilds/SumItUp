@@ -1,0 +1,28 @@
+# Hot-reload API + MongoDB (run Expo on the host for mobile dev).
+# Usage: npm run docker:dev
+services:
+  backend-dev:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    image: sumitup-backend:dev
+    container_name: sumitup-backend-dev
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: "3000"
+      NODE_ENV: development
+      MONGODB_URI: mongodb://mongodb:27017/sumitup
+      JWT_SECRET: ${JWT_SECRET:-dev-docker-jwt-secret-change-me}
+      UPLOAD_PATH: /app/uploads
+    volumes:
+      - ./backend:/app
+      - backend_node_modules:/app/node_modules
+      - backend_uploads:/app/uploads
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+volumes:
+  backend_node_modules:

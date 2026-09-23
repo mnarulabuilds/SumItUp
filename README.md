@@ -430,6 +430,21 @@ graph TB
 - **React Native** development environment
 - **Redis** (optional, for caching)
 
+### **⚡ Commands (repo root)**
+
+| Goal | Command |
+|------|---------|
+| **Full stack in Docker** (build + MongoDB + API + web) | `npm run docker:run` |
+| **Hybrid dev** (MongoDB in Docker, API + Expo on host) | `npm run install:all && npm run dev` |
+| **Unit tests on host** | `npm run test:unit` |
+| **Unit tests in Docker** | `npm run docker:test` |
+
+See **[docs/DOCKER.md](./docs/DOCKER.md)** for build details, ports, and volumes.
+
+Use **Node 20** (`nvm use`) for host-based scripts.
+
+---
+
 ### **⚡ Quick Setup**
 
 1. **Clone the Repository**

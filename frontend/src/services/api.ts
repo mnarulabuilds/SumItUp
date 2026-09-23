@@ -1,18 +1,9 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
-
-const getBaseUrl = () => {
-    if (Platform.OS === 'android') {
-        return 'http://10.0.2.2:3000/api';
-    }
-    // For iOS simulator, localhost works (it maps to host). 
-    // For web, localhost works.
-    return 'http://localhost:3000/api';
-};
+import { getApiBaseUrl } from './apiConfig';
 
 const api = axios.create({
-    baseURL: getBaseUrl(),
+    baseURL: getApiBaseUrl(),
     headers: {
         'Content-Type': 'application/json',
     },

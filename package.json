@@ -1,9 +1,30 @@
 {
-  "dependencies": {
-    "@react-navigation/bottom-tabs": "^7.4.9",
-    "react-native-gesture-handler": "^2.28.0",
-    "react-native-safe-area-context": "^5.6.1",
-    "react-native-screens": "^4.17.1",
-    "react-native-vector-icons": "^10.3.0"
+  "name": "sumitup",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SumItUp monorepo — mobile app + API",
+  "engines": {
+    "node": ">=20 <27"
+  },
+  "scripts": {
+    "install:all": "npm install && npm install --prefix backend && npm install --prefix frontend",
+    "prepare:local": "node scripts/prepare-local-dev.js",
+    "test:unit": "npm run test:unit --prefix backend && npm run test:unit --prefix frontend",
+    "dev": "npm run prepare:local && docker compose up -d mongodb && wait-on tcp:127.0.0.1:27017 && concurrently -k -n backend,frontend -c blue,magenta \"npm run dev --prefix backend\" \"npm run start --prefix frontend\"",
+    "dev:stop": "docker compose stop mongodb",
+    "dev:db": "docker compose up -d mongodb",
+    "dev:db:stop": "docker compose stop mongodb",
+    "docker:build": "docker compose build mongodb backend frontend",
+    "docker:up": "docker compose up -d mongodb backend frontend",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f backend frontend mongodb",
+    "docker:ps": "docker compose ps",
+    "docker:test": "docker compose --profile test build backend-test frontend-test && docker compose --profile test run --rm backend-test && docker compose --profile test run --rm frontend-test",
+    "docker:dev": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build backend-dev mongodb",
+    "docker:run": "npm run docker:build && npm run docker:up"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "wait-on": "^8.0.5"
   }
 }
