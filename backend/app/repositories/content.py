@@ -5,7 +5,7 @@ from bson import ObjectId
 
 from app.database import get_db
 
-CONTENT_TYPES = ("audio", "image", "video", "gif", "url", "pdf", "book", "text")
+CONTENT_TYPES = ("audio", "image", "video", "gif", "url", "pdf", "book", "text", "meeting")
 
 
 async def create_content(data: dict[str, Any]) -> dict[str, Any]:

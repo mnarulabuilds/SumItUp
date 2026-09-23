@@ -30,6 +30,8 @@ async def get_wallet(user: JwtUser = Depends(get_current_user)):
         raise HTTPException(status_code=404, detail={"error": "User not found"})
     return {
         "walletBalanceCents": db_user.get("walletBalanceCents", 0),
+        "tokens": db_user.get("tokens", 0),
+        "adEligible": db_user.get("adEligible", True),
         "subscriptionPlan": db_user.get("subscriptionPlan", "free"),
         "subscriptionExpiresAt": db_user.get("subscriptionExpiresAt"),
     }

@@ -11,7 +11,7 @@
 Build compiled images and start everything:
 
 ```bash
-npm run docker:run
+npm run docker:build && npm run docker:up
 # same as: npm run docker:build && npm run docker:up
 ```
 

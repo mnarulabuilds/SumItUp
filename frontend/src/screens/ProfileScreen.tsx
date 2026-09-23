@@ -22,6 +22,7 @@ import {
   topUpWallet,
   watchAdEarnTokens,
 } from "@/services/billing";
+import { getApiErrorMessage } from "@/utils/apiError";
 
 type ProfileScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Profile">;
@@ -68,8 +69,8 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       await subscribeToPlan(planId);
       await load();
       Alert.alert("Success", `You are now on the ${planId} plan.`);
-    } catch (err: any) {
-      Alert.alert("Subscription", err?.response?.data?.error || "Could not subscribe.");
+    } catch (err: unknown) {
+      Alert.alert("Subscription", getApiErrorMessage(err, "Could not subscribe."));
     }
   };
 
@@ -78,8 +79,8 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       await watchAdEarnTokens(`ad-${Date.now()}`);
       await load();
       Alert.alert("Thanks!", "You earned tokens from the ad.");
-    } catch (err: any) {
-      Alert.alert("Ads", err?.response?.data?.error || "Ad reward unavailable.");
+    } catch (err: unknown) {
+      Alert.alert("Ads", getApiErrorMessage(err, "Ad reward unavailable."));
     }
   };
 
@@ -89,12 +90,21 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       Alert.alert("Donation", "Enter at least $1.");
       return;
     }
+    const cents = Math.round(dollars * 100);
+    const balance = wallet?.walletBalanceCents ?? 0;
+    if (cents > balance) {
+      Alert.alert(
+        "Donation",
+        "Top up your demo wallet first — donations are deducted from wallet balance."
+      );
+      return;
+    }
     try {
-      await createDonation(Math.round(dollars * 100), "Supporting SumItUp");
+      await createDonation(cents, "Supporting SumItUp");
       await load();
       Alert.alert("Thank you!", "Your donation helps keep SumItUp running.");
-    } catch (err: any) {
-      Alert.alert("Donation", err?.response?.data?.error || "Donation failed.");
+    } catch (err: unknown) {
+      Alert.alert("Donation", getApiErrorMessage(err, "Donation failed."));
     }
   };
 

@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 from app.dependencies import JwtUser, get_current_user
 from app.repositories import preferences as pref_repo
+from app.utils.mongo_json import serialize_mongo_doc
 
 router = APIRouter(prefix="/user", tags=["user"], dependencies=[Depends(get_current_user)])
 
@@ -33,7 +34,7 @@ async def get_preferences(user: JwtUser = Depends(get_current_user)):
         prefs = await pref_repo.find_by_user_id(user.id)
         if not prefs:
             prefs = await pref_repo.create_default(user.id)
-        return {"preferences": prefs}
+        return {"preferences": serialize_mongo_doc(prefs)}
     except Exception:
         raise HTTPException(status_code=500, detail={"error": "Failed to fetch preferences"}) from None
 
@@ -42,13 +43,13 @@ async def get_preferences(user: JwtUser = Depends(get_current_user)):
 async def update_preferences(body: PreferencesBody, user: JwtUser = Depends(get_current_user)):
     updates = body.model_dump(exclude_unset=True)
     prefs = await pref_repo.update_preferences(user.id, updates)
-    return {"preferences": prefs}
+    return {"preferences": serialize_mongo_doc(prefs)}
 
 
 @router.post("/preferences/reset")
 async def reset_preferences(user: JwtUser = Depends(get_current_user)):
     prefs = await pref_repo.update_preferences(user.id, pref_repo.DEFAULT_PREFERENCES.copy())
-    return {"preferences": prefs}
+    return {"preferences": serialize_mongo_doc(prefs)}
 
 
 @router.post("/preferences/interests")
@@ -58,7 +59,7 @@ async def add_interests(body: InterestsBody, user: JwtUser = Depends(get_current
     prefs = await pref_repo.find_by_user_id(user.id) or await pref_repo.create_default(user.id)
     merged = list(set(prefs.get("interests", []) + body.interests))
     updated = await pref_repo.update_preferences(user.id, {"interests": merged})
-    return {"preferences": updated}
+    return {"preferences": serialize_mongo_doc(updated)}
 
 
 @router.delete("/preferences/interests")
@@ -70,4 +71,4 @@ async def remove_interests(body: InterestsBody, user: JwtUser = Depends(get_curr
         raise HTTPException(status_code=404, detail={"error": "Preferences not found"})
     remaining = [i for i in prefs.get("interests", []) if i not in body.interests]
     updated = await pref_repo.update_preferences(user.id, {"interests": remaining})
-    return {"preferences": updated}
+    return {"preferences": serialize_mongo_doc(updated)}

@@ -434,7 +434,7 @@ graph TB
 
 | Goal | Command |
 |------|---------|
-| **Full stack in Docker** (build + MongoDB + API + web) | `npm run docker:run` |
+| **Full stack in Docker** (build + MongoDB + API + web) | `npm run docker:build && npm run docker:up` |
 | **Hybrid dev** (MongoDB in Docker, API + Expo on host) | `npm run install:all && npm run dev` |
 | **Unit tests on host** | `npm run test:unit` |
 | **Unit tests in Docker** | `npm run docker:test` |

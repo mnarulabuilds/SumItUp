@@ -12,6 +12,7 @@ router = APIRouter(prefix="/donations", tags=["donations"], dependencies=[Depend
 
 class DonationBody(BaseModel):
     amountCents: int = Field(..., ge=100, le=100000)
+    message: str | None = None
 
 
 @router.post("/")
@@ -26,6 +27,7 @@ async def create_donation(body: DonationBody, user: JwtUser = Depends(get_curren
     doc = {
         "userId": db_user["_id"],
         "amountCents": body.amountCents,
+        "message": body.message,
         "createdAt": datetime.utcnow(),
     }
     result = await get_db().donations.insert_one(doc)

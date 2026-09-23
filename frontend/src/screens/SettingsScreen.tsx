@@ -23,14 +23,17 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
   const [summaryLength, setSummaryLength] = useState<"short" | "medium" | "long">("medium");
   const [summaryStyle, setSummaryStyle] = useState<"paragraph" | "bullets" | "insights">("bullets");
   const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [autoSave, setAutoSave] = useState(true);
 
   useEffect(() => {
     (async () => {
       try {
         const { data } = await api.get("/user/preferences");
-        setSummaryLength(data.defaultSummaryLength || "medium");
-        setSummaryStyle(data.summaryStyle || "bullets");
-        setTheme(data.theme === "light" ? "light" : "dark");
+        const prefs = data.preferences ?? data;
+        setSummaryLength(prefs.defaultSummaryLength || "medium");
+        setSummaryStyle(prefs.summaryStyle || "bullets");
+        setTheme(prefs.theme === "light" ? "light" : "dark");
+        setAutoSave(prefs.autoSaveContent !== false);
       } catch {
         // defaults remain
       } finally {
@@ -45,6 +48,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         defaultSummaryLength: summaryLength,
         summaryStyle,
         theme,
+        autoSaveContent: autoSave,
       });
       Alert.alert("Saved", "Your preferences were updated.");
     } catch {
@@ -93,6 +97,15 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
           <Text style={styles.optionText}>{option}</Text>
         </TouchableOpacity>
       ))}
+
+      <View style={styles.row}>
+        <Text style={styles.rowLabel}>Auto-save summaries to history</Text>
+        <Switch
+          value={autoSave}
+          onValueChange={setAutoSave}
+          accessibilityLabel="Auto save summaries"
+        />
+      </View>
 
       <View style={styles.row}>
         <Text style={styles.rowLabel}>Light theme (preview)</Text>

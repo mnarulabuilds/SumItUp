@@ -17,7 +17,13 @@ export type RootStackParamList = {
   Signup: undefined;
   Home: undefined;
   Upload: { contentType: string };
-  Summary: { summary: string; originalContent: string; type: string };
+  Summary: {
+    summary: string;
+    originalContent: string;
+    type: string;
+    contentId?: string;
+    title?: string;
+  };
   History: undefined;
   Profile: undefined;
   Settings: undefined;

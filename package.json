@@ -10,22 +10,14 @@
   "scripts": {
     "install:all": "npm install && npm install --prefix frontend && python3 -m venv backend/.venv && backend/.venv/bin/pip install -r backend/requirements.txt",
     "prepare:local": "node scripts/prepare-local-dev.js",
-    "test:unit": "node scripts/ensure-node.js && npm run test:unit --prefix backend && npm run test:unit --prefix frontend",
-    "test:coverage": "node scripts/ensure-node.js && npm run test:coverage --prefix backend && npm run test:coverage --prefix frontend",
-    "backend:dev": "npm run dev --prefix backend",
-    "backend:test": "npm run test:unit --prefix backend",
     "dev": "npm run prepare:local && docker compose up -d mongodb && wait-on tcp:127.0.0.1:27017 && concurrently -k -n backend,frontend -c blue,magenta \"npm run dev --prefix backend\" \"npm run start --prefix frontend\"",
     "dev:stop": "docker compose stop mongodb",
-    "dev:db": "docker compose up -d mongodb",
-    "dev:db:stop": "docker compose stop mongodb",
+    "test:unit": "node scripts/ensure-node.js && npm run test:unit --prefix backend && npm run test:unit --prefix frontend",
+    "test:coverage": "node scripts/ensure-node.js && npm run test:coverage --prefix backend && npm run test:coverage --prefix frontend",
     "docker:build": "docker compose build mongodb backend frontend",
     "docker:up": "docker compose up -d mongodb backend frontend",
     "docker:down": "docker compose down",
-    "docker:logs": "docker compose logs -f backend frontend mongodb",
-    "docker:ps": "docker compose ps",
-    "docker:test": "docker compose --profile test build backend-test frontend-test && docker compose --profile test run --rm backend-test && docker compose --profile test run --rm frontend-test",
-    "docker:dev": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build backend-dev mongodb",
-    "docker:run": "npm run docker:build && npm run docker:up"
+    "docker:test": "docker compose --profile test build backend-test frontend-test && docker compose --profile test run --rm backend-test && docker compose --profile test run --rm frontend-test"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
