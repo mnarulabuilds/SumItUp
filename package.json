@@ -9,7 +9,8 @@
   "scripts": {
     "install:all": "npm install && npm install --prefix backend && npm install --prefix frontend",
     "prepare:local": "node scripts/prepare-local-dev.js",
-    "test:unit": "npm run test:unit --prefix backend && npm run test:unit --prefix frontend",
+    "test:unit": "node scripts/ensure-node.js && npm run test:unit --prefix backend && npm run test:unit --prefix frontend",
+    "test:coverage": "node scripts/ensure-node.js && npm run test:coverage --prefix backend && npm run test:coverage --prefix frontend",
     "dev": "npm run prepare:local && docker compose up -d mongodb && wait-on tcp:127.0.0.1:27017 && concurrently -k -n backend,frontend -c blue,magenta \"npm run dev --prefix backend\" \"npm run start --prefix frontend\"",
     "dev:stop": "docker compose stop mongodb",
     "dev:db": "docker compose up -d mongodb",

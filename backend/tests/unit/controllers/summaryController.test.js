@@ -294,6 +294,15 @@ describe("Summary Controller - Book Content", () => {
       };
     });
 
+    it("should return error for unsupported book format", async () => {
+      req.body.bookData = { bookUrl: "notes.doc" };
+      sinon.stub(fs, "existsSync").returns(true);
+      await summaryController.generateBookSummary(req, res);
+      expect(res.status.calledWith(400)).to.be.true;
+      expect(res.json.firstCall.args[0].error).to.include("Unsupported book format");
+      sinon.restore();
+    });
+
     it("should generate a summary for Book content", async () => {
       req.body.bookData = { bookUrl: "sample-book.txt" };
       sinon.stub(fs, "existsSync").returns(true);

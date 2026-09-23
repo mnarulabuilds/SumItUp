@@ -12,7 +12,8 @@
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
     "test": "jest --passWithNoTests",
-    "test:unit": "jest --passWithNoTests"
+    "test:unit": "jest --passWithNoTests",
+    "test:coverage": "jest --coverage --passWithNoTests"
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",

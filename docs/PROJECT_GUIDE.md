@@ -105,7 +105,8 @@ Users can **earn tokens** (e.g. after ads) and spend them for perks such as an a
 1. Install **Node.js 18+** and **MongoDB**.  
 2. **Backend:** `cd backend`, copy `.env.example` to `.env`, set `MONGODB_URI` and `JWT_SECRET`, then `npm install` and `npm start`.  
 3. **Frontend:** `cd frontend`, `npm install`, `npm start`, then open in Expo Go or a simulator.  
-4. **Tests (backend + frontend):** from repo root, `nvm use && npm run install:all && npm run test:unit`.
+4. **Tests (backend + frontend):** from repo root, `nvm use && npm run install:all && npm run test:unit` (requires Node 20 from `.nvmrc`).
+5. **Coverage (≥80% gate):** `npm run test:coverage`.
 5. **Run everything locally (MongoDB + API + Expo):** `nvm use && npm run install:all && npm run dev` (requires Docker). Stop DB with `npm run dev:stop`.  
 5. **API docs:** With the server running, open `/api/docs` (Swagger).
 

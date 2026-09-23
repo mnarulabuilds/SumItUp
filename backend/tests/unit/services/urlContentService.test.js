@@ -31,4 +31,29 @@ describe("UrlContentService", () => {
     expect(text).to.include("Lorem ipsum");
     expect(text.length).to.be.at.least(100);
   });
+
+  it("falls back to body text when paragraphs are sparse", async () => {
+    sinon.stub(safeUrl, "assertSafePublicUrl").resolves(new URL("https://example.com/page"));
+    const bodyText = "Word ".repeat(80);
+    sinon.stub(axios, "get").resolves({
+      data: `<html><body>${bodyText}</body></html>`,
+    });
+
+    const text = await urlContentService.extractMainText("https://example.com/page");
+    expect(text.length).to.be.at.least(100);
+  });
+
+  it("rejects pages with insufficient text", async () => {
+    sinon.stub(safeUrl, "assertSafePublicUrl").resolves(new URL("https://example.com/empty"));
+    sinon.stub(axios, "get").resolves({
+      data: "<html><body>Hi</body></html>",
+    });
+
+    try {
+      await urlContentService.extractMainText("https://example.com/empty");
+      expect.fail("Expected throw");
+    } catch (err) {
+      expect(err.message).to.include("insufficient text");
+    }
+  });
 });

@@ -17,7 +17,7 @@
     "test:integration": "mocha --timeout 10000 tests/integration/**/*.test.js",
     "test:e2e": "cypress run",
     "test:all": "npm run test:unit && npm run test:integration && npm run test:e2e",
-    "test:coverage": "nyc --reporter=text --reporter=html mocha --timeout 10000 --require tests/setup.js tests/unit/**/*.test.js",
+    "test:coverage": "nyc mocha --timeout 10000 --require tests/setup.js \"tests/unit/**/*.test.js\"",
     "test:watch": "mocha --timeout 10000 --require tests/setup.js --watch tests/unit/**/*.test.js",
     "test:new-features": "mocha --timeout 10000 tests/unit/controllers/fileController.test.js tests/unit/controllers/contentController.test.js tests/unit/controllers/userPreferencesController.test.js tests/unit/models/Content.test.js tests/unit/models/UserPreferences.test.js",
     "lint": "eslint .",
