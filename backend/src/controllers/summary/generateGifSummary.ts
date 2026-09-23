@@ -1,10 +1,8 @@
 import { AuthenticatedRequest } from "@/types";
 import { Response } from "express";
-import path from "path";
-import fs from "fs";
-
-// Correct path to uploads (consistent with other controllers)
-const ROOT_DIR = path.resolve(__dirname, "../../../uploads");
+import { resolveUploadPath, assertUploadExists } from "../../utils/files/uploadPaths";
+import { AppError } from "../../lib/errors/AppError";
+import handleControllerError from "../../lib/http/handleControllerError";
 
 export async function generateGifSummary(
   req: AuthenticatedRequest,
@@ -23,12 +21,8 @@ export async function generateGifSummary(
       return;
     }
 
-    const filepath = path.join(ROOT_DIR, filename);
-
-    if (!fs.existsSync(filepath)) {
-      res.status(404).json({ error: "GIF file not found" });
-      return;
-    }
+    const filepath = resolveUploadPath(filename);
+    assertUploadExists(filepath, "GIF file not found");
 
     // GIF processing is complex (requires frame extraction).
     // Using a simulation for now, but a robust one.
@@ -42,7 +36,10 @@ export async function generateGifSummary(
       summary,
     });
   } catch (error) {
-    console.error("Error generating GIF summary:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    if (error instanceof AppError) {
+      res.status(error.statusCode).json({ error: error.message });
+      return;
+    }
+    handleControllerError(res, error, "Internal Server Error");
   }
 }

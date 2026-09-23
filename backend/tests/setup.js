@@ -1,8 +1,6 @@
 // Test setup file to mock problematic dependencies
 const Module = require('module');
 const originalRequire = Module.prototype.require;
-const path = require('path');
-
 // Register ts-node to handle TypeScript files with proper settings
 require('ts-node').register({
   transpileOnly: true,

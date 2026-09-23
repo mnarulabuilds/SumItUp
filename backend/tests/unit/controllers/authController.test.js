@@ -1,7 +1,6 @@
 const chai = require("chai");
 const { expect } = chai;
 const sinon = require("sinon");
-const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const authController = require("../../../src/controllers/auth");
 const User = require("../../../src/models/User");
@@ -14,7 +13,7 @@ describe("Auth Controller", () => {
         body: {
           username: "test",
           email: "test@example.com",
-          password: "Password1",
+          password: "Password1!",
         },
       };
       const res = {
@@ -22,8 +21,7 @@ describe("Auth Controller", () => {
         json: sinon.spy(),
       };
 
-      // Stubbing User.findOne to return null (no existing user)
-      sinon.stub(User, "findOne").resolves(null);
+      sinon.stub(User, "findByEmail").resolves(null);
       sinon
         .stub(User.prototype, "save")
         .resolves({ _id: "123456", email: "test@example.com" });
@@ -34,13 +32,13 @@ describe("Auth Controller", () => {
       expect(res.json.calledOnce).to.be.true;
 
       // Restore stubs
-      User.findOne.restore();
+      User.findByEmail.restore();
       User.prototype.save.restore();
     });
 
     it("should return 400 if username is missing", async () => {
       const req = {
-        body: { email: "test@example.com", password: "Password1" },
+        body: { email: "test@example.com", password: "Password1!" },
       };
       const res = {
         status: sinon.stub().returnsThis(),
@@ -60,7 +58,7 @@ describe("Auth Controller", () => {
 
     it("should return 400 if email is missing", async () => {
       const req = {
-        body: { username: "Test", password: "Password1" },
+        body: { username: "Test", password: "Password1!" },
       };
       const res = {
         status: sinon.stub().returnsThis(),
@@ -103,7 +101,7 @@ describe("Auth Controller", () => {
         body: {
           username: "Test",
           email: "invalid-email",
-          password: "Password1",
+          password: "Password1!",
         },
       };
       const res = {
@@ -135,11 +133,7 @@ describe("Auth Controller", () => {
 
       expect(res.status.calledOnceWith(400)).to.be.true;
       expect(res.json.calledOnce).to.be.true;
-      expect(
-        res.json.calledWith({
-          error: "Password must be alphanumeric and at least 8 characters long",
-        })
-      ).to.be.true;
+      expect(res.json.firstCall.args[0].error).to.include("Password must be at least 8 characters");
     });
 
     it("should return 409 if user already exists", async () => {
@@ -147,7 +141,7 @@ describe("Auth Controller", () => {
         body: {
           username: "User",
           email: "existing-user@example.com",
-          password: "Password1",
+          password: "Password1!",
         },
       };
       const res = {
@@ -156,7 +150,7 @@ describe("Auth Controller", () => {
       };
 
       sinon
-        .stub(User, "findOne")
+        .stub(User, "findByEmail")
         .resolves({ email: "existing-user@example.com" });
 
       await authController.signup(req, res);
@@ -165,7 +159,7 @@ describe("Auth Controller", () => {
       expect(res.json.calledOnce).to.be.true;
       expect(res.json.calledWith({ error: "User already exists" })).to.be.true;
 
-      User.findOne.restore();
+      User.findByEmail.restore();
     });
   });
 
@@ -174,7 +168,7 @@ describe("Auth Controller", () => {
       const req = {
         body: {
           email: "test@example.com",
-          password: "Password1",
+          password: "Password1!",
         },
       };
       const res = {
@@ -204,7 +198,7 @@ describe("Auth Controller", () => {
 
     it("should return 400 if email is missing", async () => {
       const req = {
-        body: { password: "Password1" },
+        body: { password: "Password1!" },
       };
       const res = {
         status: sinon.stub().returnsThis(),
@@ -238,14 +232,14 @@ describe("Auth Controller", () => {
 
     it("should return 401 if user is not found", async () => {
       const req = {
-        body: { email: "nonexistent@example.com", password: "Password1" },
+        body: { email: "nonexistent@example.com", password: "Password1!" },
       };
       const res = {
         status: sinon.stub().returnsThis(),
         json: sinon.spy(),
       };
 
-      sinon.stub(User, "findOne").resolves(null);
+      sinon.stub(User, "findByEmail").resolves(null);
 
       await authController.login(req, res);
 
@@ -253,7 +247,7 @@ describe("Auth Controller", () => {
       expect(res.json.calledOnce).to.be.true;
       expect(res.json.calledWith({ error: "User not found" })).to.be.true;
 
-      User.findOne.restore();
+      User.findByEmail.restore();
     });
 
     it("should return 401 if password is incorrect", async () => {

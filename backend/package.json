@@ -8,8 +8,8 @@
     "build": "tsc",
     "dev": "nodemon --exec ts-node index.ts",
     "start": "ts-node index.ts",
-    "test": "mocha --timeout 10000 --require tests/setup.js tests/unit/**/*.test.js",
-    "test:unit": "mocha --timeout 10000 --require tests/setup.js tests/unit/**/*.test.js",
+    "test": "mocha --timeout 10000 --require tests/setup.js \"tests/unit/**/*.test.js\"",
+    "test:unit": "mocha --timeout 10000 --require tests/setup.js \"tests/unit/**/*.test.js\"",
     "test:unit:controllers": "mocha --timeout 10000 --require tests/setup.js tests/unit/controllers/*.test.js",
     "test:unit:models": "mocha --timeout 10000 --require tests/setup.js tests/unit/models/*.test.js",
     "test:unit:services": "mocha --timeout 10000 --require tests/setup.js tests/unit/services/*.test.js",
@@ -25,6 +25,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": ">=20 <27"
+  },
   "dependencies": {
     "@tensorflow-models/mobilenet": "^2.1.1",
     "@tensorflow/tfjs": "^4.22.0",
@@ -84,7 +87,7 @@
     "eslint-plugin-import": "^2.25.3",
     "eslint-plugin-mocha": "^8.0.0",
     "istanbul": "^1.1.0-alpha.1",
-    "mocha": "^9.1.0",
+    "mocha": "^11.8.0",
     "nodemon": "^3.1.10",
     "nyc": "^15.1.0",
     "sinon": "^12.0.1",

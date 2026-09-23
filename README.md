@@ -16,6 +16,12 @@
 
 ---
 
+## 📖 **Plain-language guide**
+
+New to the repo? Start with **[docs/PROJECT_GUIDE.md](./docs/PROJECT_GUIDE.md)** for a simple explanation of what SumItUp does and how the app and API fit together. See also **[docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)** and **[docs/PRODUCT_ROADMAP.md](./docs/PRODUCT_ROADMAP.md)** for design principles and production UX ideas.
+
+---
+
 ## 🌟 **What is SumItUp?**
 
 SumItUp is an **AI-powered content summarization platform** that transforms various types of media into concise, intelligent summaries. Whether you're dealing with audio recordings, images, videos, PDFs, web articles, or books, SumItUp uses advanced machine learning to extract key insights and present them in an easily digestible format.

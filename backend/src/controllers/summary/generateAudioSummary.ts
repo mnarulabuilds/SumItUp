@@ -1,41 +1,45 @@
 import fs from "fs";
 import path from "path";
-import textUtils from "../../utils/text";
 import audioUtils from "../../utils/audio";
+import textSummarizationService from "../../services/summary/TextSummarizationService";
+import { resolveUploadPath } from "../../utils/files/uploadPaths";
 import { AuthenticatedRequest } from "@/types";
 import { Response } from "express";
+import handleControllerError from "../../lib/http/handleControllerError";
 
-const ROOT_DIR = path.resolve(__dirname, "../../../uploads");
-const LEGACY_DIR = "src/utils/audio/audios/";
+const LEGACY_DIR = path.resolve("src/utils/audio/audios/");
+
+function resolveAudioFilePath(audioFileName: string): string | null {
+  try {
+    return resolveUploadPath(audioFileName);
+  } catch {
+    return null;
+  }
+}
 
 export async function generateAudioSummary(req: AuthenticatedRequest, res: Response): Promise<void> {
   try {
     const { audioData } = req.body;
 
-    // check if valid audioData provided
     if (!audioData || !audioData.audioFileName || !audioData.format) {
       res.status(400).json({ error: "Invalid audio data provided." });
       return;
     }
 
-    // check if format is valid
     if (!["mp3", "wav"].includes(audioData.format)) {
       res.status(400).json({ error: "Audio format not supported" });
       return;
     }
 
-    // Check if the audio file exists
-    let filePath = path.resolve(ROOT_DIR, audioData.audioFileName);
-    if (!fs.existsSync(filePath)) {
-      // Try legacy path
-      filePath = path.resolve(LEGACY_DIR, audioData.audioFileName);
+    let filePath = resolveAudioFilePath(audioData.audioFileName);
+    if (!filePath || !fs.existsSync(filePath)) {
+      filePath = path.resolve(LEGACY_DIR, path.basename(audioData.audioFileName));
       if (!fs.existsSync(filePath)) {
         res.status(400).json({ error: "Audio file not found." });
         return;
       }
     }
 
-    // Convert audio to text asynchronously
     const textFromAudio = await audioUtils.convertAudioToText(
       filePath,
       audioData.format
@@ -46,14 +50,12 @@ export async function generateAudioSummary(req: AuthenticatedRequest, res: Respo
       return;
     }
 
-    // Generate summary from text
-    const summary = textUtils.generateSummaryFromText(textFromAudio);
+    const summary = await textSummarizationService.summarizeCached(textFromAudio);
 
     res.status(200).json({ summary });
   } catch (error) {
-    console.error("Error generating audio summary:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    handleControllerError(res, error, "Internal Server Error");
   }
-};
+}
 
 export default generateAudioSummary;

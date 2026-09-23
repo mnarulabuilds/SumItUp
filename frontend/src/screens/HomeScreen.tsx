@@ -98,6 +98,9 @@ const ContentCard = ({
       onPressIn={handleDisplayHoverIn}
       onPressOut={handleDisplayHoverOut}
       style={{ margin: 5 }}
+      accessibilityRole="button"
+      accessibilityLabel={`Summarize ${item.title} content`}
+      accessibilityHint={`Opens upload screen for ${item.title}`}
     >
       <Animated.View
         style={[
@@ -129,7 +132,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             Select the content type you want to summarize
           </Text>
         </View>
-        <TouchableOpacity onPress={signOut} style={styles.signOutButton}>
+        <TouchableOpacity
+          onPress={signOut}
+          style={styles.signOutButton}
+          accessibilityRole="button"
+          accessibilityLabel="Sign out"
+        >
           <Text style={styles.signOutText}>Sign Out</Text>
         </TouchableOpacity>
       </View>

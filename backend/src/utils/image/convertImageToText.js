@@ -1,5 +1,4 @@
 const fs = require("fs");
-const path = require("path");
 const tf = require("@tensorflow/tfjs");
 const mobilenet = require("@tensorflow-models/mobilenet");
 const jpeg = require("jpeg-js");
