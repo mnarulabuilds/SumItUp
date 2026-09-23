@@ -24,10 +24,6 @@ export async function generateImageSummary(req: AuthenticatedRequest, res: Respo
       res.status(error.statusCode).json({ error: error.message });
       return;
     }
-    console.error("Error generating image summary:", error);
-    res.status(200).json({
-      summary:
-        "Image Summary (Simulation): The uploaded image has been analyzed. It appears to contain visual elements that have been processed to extract this summary. (Note: Real image recognition requires valid API keys/libraries).",
-    });
+    handleControllerError(res, error, "Failed to generate image summary");
   }
 }

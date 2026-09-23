@@ -88,8 +88,9 @@ const UploadScreen: React.FC<UploadScreenProps> = ({ navigation, route }) => {
         // Use DocumentPicker for Audio, PDF, Book, etc.
         const typeMap: Record<string, string> = {
           Audio: "audio/*",
+          Meeting: "audio/*,video/*",
           PDF: "application/pdf",
-          Book: "application/pdf", // Asking for PDF for books
+          Book: "application/pdf",
         };
 
         const result = await DocumentPicker.getDocumentAsync({
@@ -186,18 +187,27 @@ const UploadScreen: React.FC<UploadScreenProps> = ({ navigation, route }) => {
 
         // Prepare payload for summary generation based on type
         switch (contentType) {
+          case "Meeting":
+            endpoint = "/summary/generate/meeting";
+            payload = {
+              meetingData: {
+                recordingFileName: uploadedFilename,
+                title: inputText || "Live meeting recording",
+              },
+            };
+            break;
           case "Audio":
             endpoint = "/summary/generate/audio";
             payload = {
               audioData: {
                 audioFileName: uploadedFilename,
-                format: "mp3", // TODO: Detect from filename or mime
+                format: uploadedFilename.endsWith(".wav") ? "wav" : "mp3",
               },
             };
             break;
           case "Video":
             endpoint = "/summary/generate/video";
-            payload = { videoData: { videoUrl: uploadedFilename } };
+            payload = { videoData: { videoFileName: uploadedFilename } };
             break;
           case "PDF":
             endpoint = "/summary/generate/pdf";
@@ -239,6 +249,29 @@ const UploadScreen: React.FC<UploadScreenProps> = ({ navigation, route }) => {
   };
 
   const renderInput = () => {
+    if (contentType === "Meeting") {
+      return (
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Meeting title (optional)</Text>
+          <TextInput
+            style={styles.textInput}
+            placeholder="Weekly standup"
+            placeholderTextColor="#64748B"
+            value={inputText}
+            onChangeText={setInputText}
+            accessibilityLabel="Meeting title"
+          />
+          <Text style={[styles.label, { marginTop: 12 }]}>Upload recording (audio/video)</Text>
+          <TouchableOpacity style={styles.uploadBox} onPress={pickFile} accessibilityRole="button" accessibilityLabel="Select meeting recording">
+            <Ionicons name="cloud-upload-outline" size={48} color="#60A5FA" />
+            <Text style={styles.uploadText}>
+              {selectedFile ? selectedFile.name : "Tap to browse recording"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+
     if (contentType === "URL") {
       return (
         <View style={styles.inputContainer}>

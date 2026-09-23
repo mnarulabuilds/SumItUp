@@ -11,14 +11,19 @@ import {
 } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "@/navigator/AppNavigator";
-import { useAuth } from "@/context/AuthContext";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import colors, { a11y } from "@/theme/a11y";
 
 type HomeScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Home">;
 };
 
 const contentTypes = [
+  {
+    title: "Meeting",
+    icon: require("@/assets/icons/audio.png"),
+    screen: "Upload" as const,
+  },
   {
     title: "Audio",
     icon: require("@/assets/icons/audio.png"),
@@ -117,8 +122,6 @@ const ContentCard = ({
 };
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
-  const { signOut } = useAuth();
-
   const renderItem = ({ item }: { item: (typeof contentTypes)[0] }) => (
     <ContentCard item={item} navigation={navigation} />
   );
@@ -128,18 +131,28 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       <View style={styles.header}>
         <View>
           <Text style={styles.title}>Welcome to SumItUp</Text>
-          <Text style={styles.subtitle}>
-            Select the content type you want to summarize
+          <Text style={styles.subtitle} accessibilityRole="text">
+            Pick a source to summarize — meetings, files, links, and more
           </Text>
         </View>
-        <TouchableOpacity
-          onPress={signOut}
-          style={styles.signOutButton}
-          accessibilityRole="button"
-          accessibilityLabel="Sign out"
-        >
-          <Text style={styles.signOutText}>Sign Out</Text>
-        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("History")}
+            style={styles.headerButton}
+            accessibilityRole="button"
+            accessibilityLabel="Open history"
+          >
+            <Text style={styles.headerButtonText}>History</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Profile")}
+            style={styles.headerButtonPrimary}
+            accessibilityRole="button"
+            accessibilityLabel="Open profile wallet and settings"
+          >
+            <Text style={styles.headerButtonText}>Profile</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <FlatList
@@ -158,9 +171,26 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 // Dimensions moved to top
 
 const styles = StyleSheet.create({
+  headerActions: { flexDirection: "row", gap: 8 },
+  headerButton: {
+    minHeight: a11y.minTouchTarget,
+    justifyContent: "center",
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  headerButtonPrimary: {
+    minHeight: a11y.minTouchTarget,
+    justifyContent: "center",
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    backgroundColor: colors.primary,
+  },
+  headerButtonText: { color: colors.textPrimary, fontWeight: "600", fontSize: 13 },
   container: {
     flex: 1,
-    backgroundColor: "#0F172A",
+    backgroundColor: colors.background,
     paddingTop: 60,
     paddingHorizontal: 20,
   },
@@ -181,16 +211,6 @@ const styles = StyleSheet.create({
     color: "gray",
     marginTop: 0,
     maxWidth: "80%",
-  },
-  signOutButton: {
-    padding: 8,
-    backgroundColor: "#ef4444",
-    borderRadius: 8,
-  },
-  signOutText: {
-    color: "white",
-    fontWeight: "600",
-    fontSize: 12,
   },
   gridContainer: {
     paddingVertical: 10,

@@ -35,5 +35,9 @@ router.post(
   "/generate/pdf",
   asyncHandler(summaryController.generatePDFSummary as express.RequestHandler)
 );
+router.post(
+  "/generate/meeting",
+  asyncHandler(summaryController.generateMeetingSummary as express.RequestHandler)
+);
 
 export default router;

@@ -21,6 +21,8 @@ import tokenRouter from "./src/routes/token";
 import fileRouter from "./src/routes/file";
 import contentRouter from "./src/routes/content";
 import userRouter from "./src/routes/user";
+import billingRouter from "./src/routes/billing";
+import donationsRouter from "./src/routes/donations";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -66,6 +68,8 @@ app.use("/api/token", tokenRouter);
 app.use("/api/file", fileRouter);
 app.use("/api/content", contentRouter);
 app.use("/api/user", userRouter);
+app.use("/api/billing", billingRouter);
+app.use("/api/donations", donationsRouter);
 
 // Root route for health check
 app.get("/", (req, res) => {

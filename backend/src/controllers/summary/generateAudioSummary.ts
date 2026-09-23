@@ -40,10 +40,7 @@ export async function generateAudioSummary(req: AuthenticatedRequest, res: Respo
       }
     }
 
-    const textFromAudio = await audioUtils.convertAudioToText(
-      filePath,
-      audioData.format
-    );
+    const textFromAudio = await audioUtils.convertAudioToText(filePath);
 
     if (!textFromAudio) {
       res.status(400).json({ error: "No text found in the audio." });

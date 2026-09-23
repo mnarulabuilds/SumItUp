@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">88.23% </span>
+                <span class="strong">88.88% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>15/17</span>
+                <span class='fraction'>16/18</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">75% </span>
+                <span class="strong">83.33% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>6/8</span>
+                <span class='fraction'>5/6</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">88.23% </span>
+                <span class="strong">88.88% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>15/17</span>
+                <span class='fraction'>16/18</span>
             </div>
         
             
@@ -98,19 +98,10 @@
 <a name='L33'></a><a href='#L33'>33</a>
 <a name='L34'></a><a href='#L34'>34</a>
 <a name='L35'></a><a href='#L35'>35</a>
-<a name='L36'></a><a href='#L36'>36</a>
-<a name='L37'></a><a href='#L37'>37</a>
-<a name='L38'></a><a href='#L38'>38</a>
-<a name='L39'></a><a href='#L39'>39</a>
-<a name='L40'></a><a href='#L40'>40</a>
-<a name='L41'></a><a href='#L41'>41</a>
-<a name='L42'></a><a href='#L42'>42</a>
-<a name='L43'></a><a href='#L43'>43</a>
-<a name='L44'></a><a href='#L44'>44</a>
-<a name='L45'></a><a href='#L45'>45</a>
-<a name='L46'></a><a href='#L46'>46</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L36'></a><a href='#L36'>36</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -119,11 +110,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
@@ -134,15 +120,9 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -153,9 +133,10 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { AuthenticatedRequest } from "@/types";
-import { Response } from "express";
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import imageService from "../../services/summary/image";
 import { resolveUploadPath, assertUploadExists } from "../../utils/files/uploadPaths";
+import { AuthenticatedRequest } from "@/types";
+import { Response } from "express";
 import { AppError } from "../../lib/errors/AppError";
 import handleControllerError from "../../lib/http/handleControllerError";
 &nbsp;
@@ -164,12 +145,7 @@ export async function generateGifSummary(
   res: Response
 ): Promise&lt;void&gt; {
   try {
-    // Frontend sends { imageData: filename } for GIFs as well in the current shared logic, 
-    // or sometimes { gifData: ... }. Let's handle what UploadScreen sends.
-    // Looking at UploadScreen.tsx Step 151: 
-    // case "GIF": endpoint = "/summary/generate/gif"; payload = { imageData: uploadedFilename };
-&nbsp;
-    const filename = req.body.imageData || (req.body.gifData ? <span class="branch-0 cbranch-no" title="branch not covered" >req.body.gifData.gifUrl </span>: null);
+    const filename = req.body.imageData || req.body.gifData?.gifUrl;
 &nbsp;
     if (!filename) {
       res.status(400).json({ error: "GIF filename is required" });
@@ -179,23 +155,17 @@ export async function generateGifSummary(
     const filepath = resolveUploadPath(filename);
     assertUploadExists(filepath, "GIF file not found");
 &nbsp;
-    // GIF processing is complex (requires frame extraction).
-    // Using a simulation for now, but a robust one.
-    const summary = `[GIF Analysis Simulation]
-    The animated GIF "${filename}" has been successfully processed.
-    Visual analysis of the keyframes indicates a short looped sequence. 
-    Motion detection algorithms identify the primary subject as dynamic.
-    (Note: Full frame-by-frame deep learning analysis requires GPU acceleration not available in this environment, but the file was successfully received and validated).`;
-&nbsp;
+    const summary = await imageService.generateSummaryFromImage(filepath);
     res.status(200).json({
       summary,
+      note: "GIF summarization uses visual classification on the source file; animated frame OCR may be limited.",
     });
   } catch (error) {
     <span class="missing-if-branch" title="if path not taken" >I</span>if (error instanceof AppError) {
 <span class="cstat-no" title="statement not covered" >      res.status(error.statusCode).json({ error: error.message });</span>
 <span class="cstat-no" title="statement not covered" >      return;</span>
     }
-    handleControllerError(res, error, "Internal Server Error");
+    handleControllerError(res, error, "Failed to generate GIF summary");
   }
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -205,7 +175,7 @@ export async function generateGifSummary(
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-09-23T18:03:24.687Z
+                at 2026-09-23T18:11:14.068Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

@@ -1,5 +1,10 @@
 import { AuthenticatedRequest } from "@/types";
 import { Response } from "express";
+import { resolveUploadPath, assertUploadExists } from "../../utils/files/uploadPaths";
+import speechToTextService from "../../services/transcription/SpeechToTextService";
+import textSummarizationService from "../../services/summary/TextSummarizationService";
+import { AppError } from "../../lib/errors/AppError";
+import handleControllerError from "../../lib/http/handleControllerError";
 
 export async function generateVideoSummary(
   req: AuthenticatedRequest,
@@ -8,47 +13,27 @@ export async function generateVideoSummary(
   try {
     const { videoData } = req.body;
 
-    if (!videoData || !videoData.videoUrl) {
-      res.status(400).json({ error: "Video URL is required" });
+    const fileRef = videoData?.videoFileName || videoData?.videoUrl;
+    if (!fileRef) {
+      res.status(400).json({ error: "Video file is required" });
       return;
     }
 
-    // Simulate Advanced Video Processing Pipeline
-    const summary = `**Advanced Video Summarization Report**
-    
-    **Target:** ${videoData.videoUrl}
-    **Processing Engine:** Multi-Stage Neural Pipeline (M-SNP v2.1)
-    
-    **Technical Metadata Extracted:**
-    - Codec: H.264 / AAC
-    - Resolution: 1920x1080 (Estimated)
-    - Frame Rate: 30fps
-    - Audio Sample Rate: 44.1kHz
-    
-    **Content Analysis:**
-    The video stream was decomposed into visual reference frames and audio spectrograms.
-    
-    **Visual Summary:**
-    - **00:00 - 00:15:** Opening intro graphics and title card.
-    - **00:15 - 01:20:** Main subject (Speaker) presenting diagrams.
-    - **01:20 - 02:45:** Screen recording / technical demonstration.
-    - **02:45 - 03:00:** Closing summary and credits.
-    
-    **Transcript Summary:**
-    "The presentation covers the fundamental architecture of the new system, highlighting modularity and scalability."
-    
-    **Key Takeaways:**
-    1. System stability is prioritized.
-    2. New modules can be hot-swapped.
-    3. Performance metrics show a 20% increase.
-    
-    (Note: This detailed report is a simulation of the capabilities enabled by the underlying sophisticated media processing architecture).`;
+    const filePath = resolveUploadPath(fileRef);
+    assertUploadExists(filePath, "Video file not found");
 
-    res.status(200).json({
-      summary,
+    const transcript = await speechToTextService.transcribeFile(filePath);
+    const summary = await textSummarizationService.summarizeCached(transcript, {
+      length: "medium",
+      style: "bullets",
     });
+
+    res.status(200).json({ summary, transcriptLength: transcript.length });
   } catch (error) {
-    console.error("Error generating video summary:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    if (error instanceof AppError) {
+      res.status(error.statusCode).json({ error: error.message });
+      return;
+    }
+    handleControllerError(res, error, "Failed to process video");
   }
 }

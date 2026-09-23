@@ -7,6 +7,9 @@ export interface IUser extends Document {
   password: string;
   email: string;
   tokens: number;
+  walletBalanceCents: number;
+  subscriptionPlan: "free" | "plus" | "pro";
+  subscriptionExpiresAt?: Date;
   adEligible: boolean;
   resetToken?: string;
   resetTokenExpiry?: Date;
@@ -32,6 +35,13 @@ const userSchema = new Schema<IUser>({
     match: [/.+@.+\..+/, "Please enter a valid email address"],
   },
   tokens: { type: Number, default: 0 },
+  walletBalanceCents: { type: Number, default: 0, min: 0 },
+  subscriptionPlan: {
+    type: String,
+    enum: ["free", "plus", "pro"],
+    default: "free",
+  },
+  subscriptionExpiresAt: { type: Date },
   adEligible: { type: Boolean, default: true },
   resetToken: { type: String }, // For password reset functionality
   resetTokenExpiry: { type: Date }, // Expiry of the reset token

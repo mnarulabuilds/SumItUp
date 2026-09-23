@@ -16,6 +16,21 @@ Module.prototype.require = function(id) {
   if (id === 'deepspeech') {
     return require('./mocks/deepspeech');
   }
+
+  if (id === 'assemblyai') {
+    return {
+      AssemblyAI: class MockAssemblyAI {
+        constructor() {
+          this.transcripts = {
+            transcribe: async () => ({
+              status: 'completed',
+              text: 'Transcribed meeting and audio content for tests.',
+            }),
+          };
+        }
+      },
+    };
+  }
   
   // Call original require
   const module = originalRequire.apply(this, arguments);

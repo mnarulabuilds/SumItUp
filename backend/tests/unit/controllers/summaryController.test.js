@@ -141,8 +141,8 @@ describe("Summary Controller - Image Content", () => {
 
       await summaryController.generateImageSummary(req, res);
 
-      expect(res.status.calledOnceWith(200)).to.be.true;
-      expect(res.json.firstCall.args[0].summary).to.include("Image Summary (Simulation)");
+      expect(res.status.calledOnceWith(500)).to.be.true;
+      expect(res.json.firstCall.args[0].error).to.include("Failed to generate image summary");
 
       // Restore the stubs
       sinon.restore();
@@ -162,21 +162,25 @@ describe("Summary Controller - Video Content", () => {
       };
     });
 
-    it("should return error if video URL is missing", async () => {
+    it("should return error if video file is missing", async () => {
       await summaryController.generateVideoSummary(req, res);
       expect(res.status.calledWith(400)).to.be.true;
-      expect(res.json.calledWith({ error: "Video URL is required" })).to.be.true;
+      expect(res.json.calledWith({ error: "Video file is required" })).to.be.true;
     });
 
-    it("should return placeholder summary for valid video URL", async () => {
-      req.body.videoData = { videoUrl: "https://example.com/video.mp4" };
+    it("should return summary for uploaded video file", async () => {
+      req.body.videoData = { videoFileName: "clip.mp4" };
+      sinon.stub(fs, "existsSync").returns(true);
+      const speech = require("../../../src/services/transcription/SpeechToTextService").default
+        || require("../../../src/services/transcription/SpeechToTextService");
+      const textSummarizationService = require("../../../src/services/summary/TextSummarizationService").default
+        || require("../../../src/services/summary/TextSummarizationService");
+      sinon.stub(speech, "transcribeFile").resolves("Video transcript content.");
+      sinon.stub(textSummarizationService, "summarizeCached").resolves("Video summary.");
       await summaryController.generateVideoSummary(req, res);
       expect(res.status.calledWith(200)).to.be.true;
-      expect(res.json.calledOnce).to.be.true;
-      const response = res.json.getCall(0).args[0];
-      expect(response).to.have.property("summary");
-      expect(response.summary).to.include("Advanced Video Summarization Report");
-      expect(response.summary).to.include("https://example.com/video.mp4");
+      expect(res.json.calledWith({ summary: "Video summary.", transcriptLength: 25 })).to.be.true;
+      sinon.restore();
     });
 
     it("should handle internal server error", async () => {
@@ -184,7 +188,7 @@ describe("Summary Controller - Video Content", () => {
       req.body = null;
       await summaryController.generateVideoSummary(req, res);
       expect(res.status.calledWith(500)).to.be.true;
-      expect(res.json.calledWith({ error: "Internal Server Error" })).to.be.true;
+      expect(res.json.firstCall.args[0].error).to.include("Failed to process video");
     });
   });
 });
@@ -207,15 +211,13 @@ describe("Summary Controller - GIF Content", () => {
       expect(res.json.calledWith({ error: "GIF filename is required" })).to.be.true;
     });
 
-    it("should return placeholder summary for valid GIF URL", async () => {
+    it("should return summary for valid GIF file", async () => {
       req.body.imageData = "animation.gif";
       sinon.stub(fs, "existsSync").returns(true);
+      sinon.stub(imageService, "generateSummaryFromImage").resolves("GIF visual summary.");
       await summaryController.generateGifSummary(req, res);
       expect(res.status.calledWith(200)).to.be.true;
-      expect(res.json.calledOnce).to.be.true;
-      const response = res.json.getCall(0).args[0];
-      expect(response).to.have.property("summary");
-      expect(response.summary).to.include("animation.gif");
+      expect(res.json.firstCall.args[0].summary).to.equal("GIF visual summary.");
       sinon.restore();
     });
 
@@ -223,7 +225,7 @@ describe("Summary Controller - GIF Content", () => {
       req.body = null;
       await summaryController.generateGifSummary(req, res);
       expect(res.status.calledWith(500)).to.be.true;
-      expect(res.json.calledWith({ error: "Internal Server Error" })).to.be.true;
+      expect(res.json.firstCall.args[0].error).to.include("Failed to generate GIF summary");
     });
   });
 });

@@ -4,20 +4,18 @@ const stopwords = require("stopwords").english;
 const tokenizer = new natural.WordTokenizer();
 const sentenceTokenizer = new natural.SentenceTokenizer();
 
-// Helper to calculate similarity between two sentences
 function sentenceSimilarity(sent1, sent2) {
-  const tokens1 = tokenizer.tokenize(sent1).map(t => t.toLowerCase());
-  const tokens2 = tokenizer.tokenize(sent2).map(t => t.toLowerCase());
+  const tokens1 = tokenizer.tokenize(sent1).map((t) => t.toLowerCase());
+  const tokens2 = tokenizer.tokenize(sent2).map((t) => t.toLowerCase());
 
   const allTokens = new Set([...tokens1, ...tokens2]);
-  const tokenList = Array.from(allTokens).filter(t => !stopwords.includes(t));
+  const tokenList = Array.from(allTokens).filter((t) => !stopwords.includes(t));
 
   if (tokenList.length === 0) return 0;
 
-  const vec1 = tokenList.map(t => tokens1.includes(t) ? 1 : 0);
-  const vec2 = tokenList.map(t => tokens2.includes(t) ? 1 : 0);
+  const vec1 = tokenList.map((t) => (tokens1.includes(t) ? 1 : 0));
+  const vec2 = tokenList.map((t) => (tokens2.includes(t) ? 1 : 0));
 
-  // Cosine similarity
   let dotProduct = 0;
   let mag1 = 0;
   let mag2 = 0;
@@ -32,41 +30,51 @@ function sentenceSimilarity(sent1, sent2) {
   return dotProduct / (Math.sqrt(mag1) * Math.sqrt(mag2));
 }
 
-const generateSummaryFromText = (text) => {
+function pickSentenceCount(totalSentences, options = {}) {
+  const length = options.length || "medium";
+  const ratio = length === "short" ? 0.2 : length === "long" ? 0.45 : 0.3;
+  const cap = length === "short" ? 4 : length === "long" ? 10 : 6;
+  return Math.max(2, Math.min(cap, Math.floor(totalSentences * ratio)));
+}
+
+function formatSummary(sentences, style = "paragraph") {
+  if (style === "bullets") {
+    return sentences.map((s) => `• ${s.trim()}`).join("\n");
+  }
+  if (style === "insights") {
+    return sentences.map((s, i) => `${i + 1}. ${s.trim()}`).join("\n");
+  }
+  return sentences.join(" ");
+}
+
+const generateSummaryFromText = (text, options = {}) => {
   if (!text) return "";
 
-  // 1. Split into sentences
   const sentences = sentenceTokenizer.tokenize(text);
-  if (sentences.length <= 3) return text; // Too short to summarize
+  if (sentences.length <= 3) return formatSummary(sentences, options.style);
 
-  // 2. Build similarity matrix
   const scores = new Array(sentences.length).fill(0);
 
   for (let i = 0; i < sentences.length; i++) {
     for (let j = 0; j < sentences.length; j++) {
       if (i === j) continue;
-      const sim = sentenceSimilarity(sentences[i], sentences[j]);
-      scores[i] += sim;
+      scores[i] += sentenceSimilarity(sentences[i], sentences[j]);
     }
 
-    // Boost scores for key sentences
     const sentLower = sentences[i].toLowerCase();
-    if (sentLower.includes("in conclusion") || sentLower.includes("summar")) scores[i] *= 1.2;
-    if (sentLower.includes("important") || sentLower.includes("significant")) scores[i] *= 1.1;
+    if (sentLower.includes("in conclusion") || sentLower.includes("summar")) scores[i] *= 1.25;
+    if (sentLower.includes("important") || sentLower.includes("significant")) scores[i] *= 1.15;
+    if (sentLower.includes("decision") || sentLower.includes("action item")) scores[i] *= 1.2;
   }
 
-  // 3. Sort sentences by score
   const indexedScores = scores.map((score, index) => ({ score, index }));
   indexedScores.sort((a, b) => b.score - a.score);
 
-  // 4. Pick top N sentences (e.g., top 30% or max 5 sentences)
-  const count = Math.max(3, Math.min(5, Math.floor(sentences.length * 0.3)));
-  const topIndices = indexedScores.slice(0, count).map(item => item.index);
-
-  // 5. Reorder by original position
+  const count = pickSentenceCount(sentences.length, options);
+  const topIndices = indexedScores.slice(0, count).map((item) => item.index);
   topIndices.sort((a, b) => a - b);
 
-  return topIndices.map(i => sentences[i]).join(" ");
+  return formatSummary(topIndices.map((i) => sentences[i]), options.style);
 };
 
 module.exports = generateSummaryFromText;
