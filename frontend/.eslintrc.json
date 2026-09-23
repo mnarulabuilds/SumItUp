@@ -1,7 +1,20 @@
 {
   "root": true,
-  "extends": ["expo", "eslint:recommended"],
-  "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
-  "ignorePatterns": ["node_modules/", "coverage/", ".expo/"]
+  "extends": ["expo"],
+  "ignorePatterns": [
+    "node_modules/",
+    "coverage/",
+    ".expo/",
+    "metro.config.js",
+    "babel.config.js",
+    "jest.config.ts"
+  ],
+  "overrides": [
+    {
+      "files": ["**/__tests__/**/*", "**/*.test.ts", "**/*.test.tsx"],
+      "env": {
+        "jest": true
+      }
+    }
+  ]
 }

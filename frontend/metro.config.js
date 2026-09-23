@@ -1,10 +1,10 @@
-import path from "path";
-import { getDefaultConfig } from "expo/metro-config";
+const path = require("path");
+const { getDefaultConfig } = require("expo/metro-config");
 
 const config = getDefaultConfig(__dirname);
 
 const resolver = config.resolver ?? {};
-(resolver as { alias?: Record<string, string> }).alias = {
+resolver.alias = {
   "@": path.resolve(__dirname, "src"),
   "@components": path.resolve(__dirname, "src/components"),
   "@screens": path.resolve(__dirname, "src/screens"),
@@ -17,4 +17,4 @@ const resolver = config.resolver ?? {};
 config.resolver = resolver;
 config.resolver.sourceExts = [...(config.resolver.sourceExts ?? []), "ts", "tsx"];
 
-export default config;
+module.exports = config;
